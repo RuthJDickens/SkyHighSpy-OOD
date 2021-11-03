@@ -8,6 +8,7 @@ constexpr int origin_offset_y = 15;
 
 //Functions
 void Restart(int level);
+bool IsColliding(GameObject* obj1, GameObject* obj2);
 
 struct GameState
 {

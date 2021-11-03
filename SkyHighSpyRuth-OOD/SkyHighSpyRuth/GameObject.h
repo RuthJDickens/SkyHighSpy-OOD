@@ -34,9 +34,6 @@ public:
     void SetPosition( Point2f pos ) { m_pos = pos; }
     Point2f GetPosition() const { return m_pos; };
 
-    /*void SetOldPosition(Point2f pos) { m_oldPos = pos; };
-    Point2f GetOldPosition() const { return m_oldPos; };*/
-
     void SetVelocity( Vector2f vel ) { m_velocity = vel; }
     Vector2f GetVelocity() const { return m_velocity; };
 
@@ -51,6 +48,7 @@ public:
 
     int GetId() const { return m_id; };
     void SetType(GameObject::Type eType) { m_type = eType; };
+    int GetRadius() const { return m_radius; };
 
     //Static methods = general methods, not called on specific objects
     static int GetObjectCount( Type eType );

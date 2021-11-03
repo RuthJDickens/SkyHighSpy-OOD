@@ -3,12 +3,17 @@
 #include "GameObject.h"
 #include "Asteroid.h"
 
+Asteroid::Asteroid()
+{
+	m_type = OBJ_ASTEROID;
+}
 Asteroid::Asteroid(Point2f pos, int rotation)
 {
 	m_pos = pos;
 	m_rotation = rotation;
 	m_animSpeed = 0.05;
 	m_speed = 4;
+	m_radius = 60;
 	m_type = OBJ_ASTEROID;
 }
 
@@ -38,13 +43,26 @@ void Asteroid::Update(GameState& state)
 
 void Asteroid::Spawn(GameState& state)
 {
+	Asteroid* rock;
 	for (int i = 1; i <= state.startingLevel; i++)
 	{
 		//Randomly set position and rotation - can we design it in a way for both asteroid and meteors to remore repeat code?
 		int pos_x = Play::RandomRoll(DISPLAY_WIDTH);
 		int pos_y = Play::RandomRoll(DISPLAY_HEIGHT);
 		float rotation = (((float)rand() / RAND_MAX) * (PLAY_PI * 2));
-		new Asteroid({ pos_x,pos_y }, rotation);
+		rock = new Asteroid({ pos_x,pos_y }, rotation);
+	}
+
+	std::vector<GameObject*> vMeteors;
+	GetObjectList(OBJ_METEOR, vMeteors);
+	for (GameObject* m : vMeteors)
+	{
+		if (IsColliding(rock, m))
+		{
+			int newPos_x = rock->GetPosition().x + 20 * sin(rock->GetRotation();
+			int newPos_y = rock->GetPosition().y + 20 * -cos(rock->GetRotation();
+			rock->SetPosition({ newPos_x, newPos_y });
+		}
 	}
 
 	//Randomly choose one for Agent8 to start on

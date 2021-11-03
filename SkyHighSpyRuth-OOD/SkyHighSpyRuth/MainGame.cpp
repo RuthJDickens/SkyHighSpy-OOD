@@ -2,6 +2,9 @@
 //#define PLAY_USING_GAMEOBJECT_MANAGER
 #include "Play.h"
 #include "MainGame.h"
+#include "GameObject.h"
+#include "Asteroid.h"
+#include "Meteor.h"
 
 enum Agent8States //Agent 8
 {
@@ -11,7 +14,6 @@ enum Agent8States //Agent 8
 	STATE_START,
 };
 
-
 GameState gameState;
 
 void UpdateAgent();	//Agent.h
@@ -20,7 +22,7 @@ void StateFlying();
 void StateDead();
 void StateStart(); //Agent.h but maybe main game game state in future?
 void AgentAttached();
-void SpawnMeteors(int level); //Meteors.h - child of Asteroid?
+
 void SpawnPieces(GameObject& object); //Pieces.h
 void UpdatePieces(); //Piece.h
 
@@ -45,8 +47,8 @@ void MainGameEntry(PLAY_IGNORE_COMMAND_LINE)
 	Play::MoveSpriteOrigin("asteroid_2", 0, 1 - origin_offset_y);
 
 	//Platforms and hazards
-	SpawnRocks(gameState.startingLevel);
-	SpawnMeteors(gameState.startingLevel);
+	Meteor::Spawn(gameState);
+	Asteroid::Spawn(gameState);
 }
 
 // Called by PlayBuffer every frame (60 times a second!)
@@ -54,9 +56,8 @@ bool MainGameUpdate( float elapsedTime )
 {
 	Play::DrawBackground();
 	//Play::ClearDrawingBuffer(Play::cBlack);
-	UpdateRock(); //GameObject UpdateAll()
+ //GameObject UpdateAll()
 	UpdateAgent();
-	UpdatePieces();
 	UpdateRings();
 	UpdateParticles();
 
@@ -72,64 +73,13 @@ bool MainGameUpdate( float elapsedTime )
 	return Play::KeyDown( VK_ESCAPE );
 }
 
-void SpawnMeteors(int level) //Meteor.h
+bool IsColliding(GameObject* obj1, GameObject* obj2)
 {
-	//Same as for asteroids but half has many meteors
-	for (int i = 1; i <= level / 2; i++)
-	{
-		//Random Positon
-		int pos_x = Play::RandomRoll(DISPLAY_WIDTH);
-		int pos_y = Play::RandomRoll(DISPLAY_HEIGHT);
-		int id_meteor = Play::CreateGameObject(TYPE_METEOR, { pos_x, pos_y }, 60, "meteor");
-		GameObject& obj_meteor = Play::GetGameObject(id_meteor);
-		std::vector<int> vRocks = Play::CollectGameObjectIDsByType(TYPE_ASTEROID);
-		GameObject& obj_attached = Play::GetGameObjectByType(TYPE_ATTACHED);
-		for (int id : vRocks)
-		{
-			GameObject& obj_rock = Play::GetGameObject(id);
-			if (Play::IsColliding(obj_meteor, obj_rock) || Play::IsColliding(obj_meteor, obj_attached))
-			{
-				obj_meteor.pos.x = obj_meteor.pos.x + 20 * sin(obj_meteor.rotation);
-				obj_meteor.pos.y = obj_meteor.pos.y + 20 * -cos(obj_meteor.rotation);
-			}
-		}
+	int xDiff = obj1->GetPosition().x - obj2->GetPosition().x;
+	int yDiff = obj1->GetPosition().y - obj2->GetPosition().y;
+	int radii = obj1->GetRadius() + obj2->GetRadius();
 
-		//Random Float rotation
-		/*std::random_device seed;
-		std::default_random_engine eng(seed());
-		std::uniform_real_distribution<float> randomNumber(randomMin, randomMax);*/
-
-		float rotation = (((float)rand() / RAND_MAX) * (PLAY_PI * 2));	// 0-2PI radians
-		obj_meteor.rotation = rotation;
-		obj_meteor.animSpeed = 0.05;
-	}
-}
-
-void UpdateRock() //Asteroid.h - meteors as child of asteroid?
-{
-	//For both asteroids and meteors
-	std::vector<std::vector<int>> vRocks =
-	{
-		{ Play::CollectGameObjectIDsByType(TYPE_ASTEROID) },
-		{ Play::CollectGameObjectIDsByType(TYPE_METEOR) }
-	};
-	for (std::vector<int> vec : vRocks)
-	{
-		for (int id : vec)
-		{
-			//Movement
-			GameObject& obj_rock = Play::GetGameObject(id);
-			Play::DrawObjectRotated(obj_rock);
-			Play::SetGameObjectDirection(obj_rock, 4, obj_rock.rotation);
-
-			if (Play::IsLeavingDisplayArea(obj_rock))
-			{
-				WrapMovement(obj_rock);
-			}
-
-			Play::UpdateGameObject(obj_rock);
-		}
-	}
+	return ((xDiff * xDiff) + (yDiff * yDiff) < radii * radii);
 }
 
 void UpdateAgent() //agent8.h
@@ -331,36 +281,6 @@ void AgentAttached()
 	if (Play::IsLeavingDisplayArea(obj_attached))
 	{
 		WrapMovement(obj_attached);
-	}
-}
-
-void SpawnPieces(GameObject& object)
-{
-	float rad = 0.25f;
-	//Three pieces in three opposite directions
-	for (int i = 1; i <= 3; i++)
-	{
-		int id_piece = Play::CreateGameObject(TYPE_PIECES, object.pos, 0, "asteroid_pieces");
-		GameObject& obj_piece = Play::GetGameObject(id_piece);
-		Play::SetGameObjectDirection(obj_piece, 10, rad);
-		obj_piece.frame = i;
-		rad += 0.5f;
-	}
-}
-
-void UpdatePieces()
-{
-	//Movement of pieces
-	std::vector<int> vPieces = Play::CollectGameObjectIDsByType(TYPE_PIECES);
-	for (int id : vPieces)
-	{
-		GameObject& obj_piece = Play::GetGameObject(id);
-		Play::DrawObjectRotated(obj_piece);
-		Play::UpdateGameObject(obj_piece);
-		if (!Play::IsVisible(obj_piece))
-		{
-			Play::DestroyGameObject(id);
-		}
 	}
 }
 
