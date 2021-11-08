@@ -15,56 +15,51 @@ Asteroid::Asteroid(Point2f pos, int rotation)
 	m_speed = 4;
 	m_radius = 60;
 	m_type = OBJ_ASTEROID;
+	m_spriteId = Play::GetSpriteId("asteroid");
 }
 
 void Asteroid::Update(GameState& state)
 {
 	//Movement
-	m_velocity.x = m_speed * cos(m_rotation);
-	m_velocity.y = m_speed * -sin(m_rotation);
+	m_velocity.x = m_speed * sin(m_rotation);
+	m_velocity.y = m_speed * -cos(m_rotation);
+
+	m_oldPos = m_pos;
 	m_pos += m_velocity;
 	//Animation
 	m_framePos += m_animSpeed;
 	if (m_framePos >= 1)
 	{
 		m_frame++;
-		m_framePos = 1;
+		m_framePos = 0;
 	}
-	//Leaving Area
-	if (m_pos.x >= DISPLAY_WIDTH || m_pos.y >= DISPLAY_HEIGHT)
-	{
-		WrapMovement();
-	}
-	if (m_pos.x <= 0 || m_pos.y <= 0)
-	{
-		WrapMovement();
-	}
+	LeavingArea();
 }
 
 void Asteroid::Spawn(GameState& state)
 {
-	Asteroid* rock;
 	for (int i = 1; i <= state.startingLevel; i++)
 	{
 		//Randomly set position and rotation - can we design it in a way for both asteroid and meteors to remore repeat code?
 		int pos_x = Play::RandomRoll(DISPLAY_WIDTH);
 		int pos_y = Play::RandomRoll(DISPLAY_HEIGHT);
 		float rotation = (((float)rand() / RAND_MAX) * (PLAY_PI * 2));
-		rock = new Asteroid({ pos_x,pos_y }, rotation);
-	}
+		Asteroid* rock = new Asteroid({ pos_x,pos_y }, rotation);
+		rock->m_drawOrder = 4;
 
-	std::vector<GameObject*> vMeteors;
-	GetObjectList(OBJ_METEOR, vMeteors);
-	for (GameObject* m : vMeteors)
-	{
-		if (IsColliding(rock, m))
+		//Check not sharing space with deadly meteor - unfair for player
+		std::vector<GameObject*> vMeteors;
+		GetObjectList(OBJ_METEOR, vMeteors);
+		for (GameObject* m : vMeteors)
 		{
-			int newPos_x = rock->GetPosition().x + 20 * sin(rock->GetRotation();
-			int newPos_y = rock->GetPosition().y + 20 * -cos(rock->GetRotation();
-			rock->SetPosition({ newPos_x, newPos_y });
+			if (rock->IsColliding(m))
+			{
+				int newPos_x = rock->GetPosition().x + 20 * sin(rock->GetRotation());
+				int newPos_y = rock->GetPosition().y + 20 * -cos(rock->GetRotation());
+				rock->SetPosition({ newPos_x, newPos_y });
+			}
 		}
 	}
-
 	//Randomly choose one for Agent8 to start on
 	std::vector<GameObject*> vRocks;
 	GetObjectList(OBJ_ASTEROID, vRocks);
@@ -74,5 +69,5 @@ void Asteroid::Spawn(GameState& state)
 
 void Asteroid::Draw(GameState& state)
 {
-	Play::DrawSpriteRotated(Play::GetSpriteId("asteroid"), m_pos, 0, m_rotation, 1.0f);
+	Play::DrawSpriteRotated(m_spriteId, m_pos, 0, m_rotation, 1.0f);
 }

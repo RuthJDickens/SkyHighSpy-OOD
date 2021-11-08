@@ -4091,6 +4091,9 @@ namespace Play
 		float xdiff = obj.pos.x - targetX;
 		float ydiff = obj.pos.y - targetY;
 
+		// tan( rot ) = opp / adj
+		// rot = atan( opp/ adj )
+
 		obj.rotation = atan2( ydiff, xdiff ) - (PLAY_PI/2);
 
 		obj.velocity.x = speed * sin( obj.rotation );

@@ -1,7 +1,5 @@
 #pragma once
 
-static int counter{ 0 };
-
 class GameObject
 {
 public:
@@ -16,7 +14,7 @@ public:
         OBJ_GEM,
         OBJ_PIECES,
         OBJ_PARTICLES,
-        OBJ_ALL = 999
+        OBJ_UI,
     };
 
     //Constructors and Destructor
@@ -28,11 +26,15 @@ public:
     virtual void Update( GameState& state ) = 0;
     virtual void Draw( GameState& state ) = 0;
 
-    void WrapMovement();
+    void LeavingArea();
+    void WrapMovement(int width, int height);
+    bool IsColliding(GameObject* other);
 
     //Inherited Getters and Setters
     void SetPosition( Point2f pos ) { m_pos = pos; }
     Point2f GetPosition() const { return m_pos; };
+
+    Point2f GetOldPosition() const { return m_oldPos; };
 
     void SetVelocity( Vector2f vel ) { m_velocity = vel; }
     Vector2f GetVelocity() const { return m_velocity; };
@@ -47,6 +49,7 @@ public:
     int GetUpdateOrder() const { return m_updateOrder; };
 
     int GetId() const { return m_id; };
+    void SetInactive() { m_active = { false }; };
     void SetType(GameObject::Type eType) { m_type = eType; };
     int GetRadius() const { return m_radius; };
 
@@ -71,10 +74,10 @@ protected:
     Point2f m_oldPos{ 0,0 };
     Vector2f m_velocity{ 0, 0 };
     int m_speed{ 0 };
-    int m_rotation{ 0 };
-    int m_rotSpeed{ 0 };
-    int m_animSpeed{ 0 };
-    int m_framePos{ 0 };
+    float m_rotation{ 0 };
+    float m_rotSpeed{ 0 };
+    float m_animSpeed{ 0 };
+    float m_framePos{ 0 };
     int m_frame{ 0 };
     int m_radius{ 0 };
     int m_id{ 0 };
@@ -82,6 +85,8 @@ protected:
 
     int m_drawOrder{ 0 };
     int m_updateOrder{ 0 };
+
+    static int counter;
 
     static std::vector< GameObject* > s_vUpdateList;
     static std::vector< GameObject* > s_vDrawList;

@@ -27,6 +27,7 @@
     <ClCompile Include="Meteor.cpp" />
     <ClCompile Include="Particles.cpp" />
     <ClCompile Include="Pieces.cpp" />
+    <ClCompile Include="UserInterface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Agent8.h" />
@@ -38,6 +39,7 @@
     <ClInclude Include="Particles.h" />
     <ClInclude Include="Pieces.h" />
     <ClInclude Include="Play.h" />
+    <ClInclude Include="UserInterface.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

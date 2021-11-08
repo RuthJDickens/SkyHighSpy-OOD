@@ -4,6 +4,7 @@
 
 std::vector< GameObject* > GameObject::s_vUpdateList;
 std::vector< GameObject* > GameObject::s_vDrawList;
+int GameObject::counter{ 0 };
 
 //Constructors
 GameObject::GameObject()
@@ -29,7 +30,21 @@ GameObject::~GameObject()
 	s_vUpdateList.erase( std::find( s_vUpdateList.begin(), s_vUpdateList.end(), this ) );
 }
 
-void GameObject::WrapMovement()
+void GameObject::LeavingArea()
+{
+	int width = Play::GetSpriteWidth(m_spriteId);
+	int height = Play::GetSpriteHeight(m_spriteId);
+	if (m_pos.x >= DISPLAY_WIDTH + 100 || m_pos.y >= DISPLAY_HEIGHT + 100)
+	{
+		WrapMovement(width, height);
+	}
+	if (m_pos.x <= -100 || m_pos.y <= -100)
+	{
+		WrapMovement(width, height);
+	}
+}
+
+void GameObject::WrapMovement(int width, int height)
 {
 	if (m_pos.x > DISPLAY_WIDTH + 100)
 	{
@@ -47,6 +62,15 @@ void GameObject::WrapMovement()
 	{
 		m_pos.y += m_oldPos.y * -1 + DISPLAY_HEIGHT;
 	}
+}
+
+bool GameObject::IsColliding(GameObject* other)
+{
+	int xDiff = m_pos.x - other->GetPosition().x;
+	int yDiff = m_pos.y - other->GetPosition().y;
+	int radii = m_radius + other->GetRadius();
+
+	return ((xDiff * xDiff) + (yDiff * yDiff) < radii * radii);
 }
 
 void GameObject::UpdateAll( GameState& state )
@@ -80,7 +104,7 @@ int GameObject::GetObjectCount( GameObject::Type type )
 
 	for( GameObject* p : s_vUpdateList )
 	{
-		if( p->m_type == type || type == OBJ_ALL )
+		if( p->m_type == type )
 			count++;
 	}
 
@@ -94,8 +118,10 @@ int GameObject::GetObjectList( GameObject::Type type, std::vector< GameObject* >
 
 	for( GameObject* p : s_vUpdateList )
 	{
-		if( p->m_type == type || type == OBJ_ALL )
-			vList.push_back( p );
+		if (p->m_type == type)
+		{
+			vList.push_back(p);
+		}
 	}
 
 	return vList.size();

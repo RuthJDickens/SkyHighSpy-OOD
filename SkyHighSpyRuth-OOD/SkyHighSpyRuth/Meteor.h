@@ -7,6 +7,5 @@ private:
 public:
 	Meteor(Point2f pos, int rotation);
 	static void Spawn(GameState& state);
-
 };
 

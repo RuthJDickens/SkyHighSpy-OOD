@@ -8,18 +8,26 @@ Pieces::Pieces(Point2f pos)
 	m_pos = pos;
 	m_speed = 10;
 	m_type = OBJ_PIECES;
+	m_spriteId = Play::GetSpriteId("asteroid_pieces");
 }
 
 void Pieces::Update(GameState& state)
 {
 	//Movement of pieces
+	m_velocity.x = m_speed * cos(m_rotation);
+	m_velocity.y = m_speed * -sin(m_rotation);
+	m_pos += m_velocity;
+
+	int width = Play::GetSpriteWidth(m_spriteId);
+	int height = Play::GetSpriteHeight(m_spriteId);
+
+	if (m_pos.x >= DISPLAY_WIDTH + width || m_pos.x <= -width)
 	{
-		GameObject& obj_piece = Play::GetGameObject(id);
-		Play::UpdateGameObject(obj_piece);
-		if (!Play::IsVisible(obj_piece))
-		{
-			Play::DestroyGameObject(id);
-		}
+		m_active = { false };
+	}
+	if (m_pos.y >= DISPLAY_HEIGHT + height || m_pos.y <= -height)
+	{
+		m_active = { false };
 	}
 }
 
@@ -33,11 +41,12 @@ void Pieces::Spawn(GameState& state)
 		Pieces* object = new Pieces(rock->GetPosition());
 		object->SetRotation(rad);
 		object->m_frame = i;
+		object->m_drawOrder = 2;
 		rad += 0.5f;
 	}
 }
 
 void Pieces::Draw(GameState& state)
 {
-	Play::DrawSpriteRotated(Play::GetSpriteId("asteroid_pieces"), m_pos, m_frame, m_rotation, 1.0f);
+	Play::DrawSpriteRotated(m_spriteId, m_pos, m_frame, m_rotation, 1.0f);
 }

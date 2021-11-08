@@ -12,6 +12,7 @@ Meteor::Meteor(Point2f pos, int rotation)
 	m_animSpeed = 0.05;
 	m_speed = 4;
 	m_radius = 60;
+	m_spriteId = Play::GetSpriteId("meteor");
 }
 
 void Meteor::Spawn(GameState& state)
@@ -23,6 +24,7 @@ void Meteor::Spawn(GameState& state)
 		int pos_x = Play::RandomRoll(DISPLAY_WIDTH);
 		int pos_y = Play::RandomRoll(DISPLAY_HEIGHT);
 		float rotation = (((float)rand() / RAND_MAX) * (PLAY_PI * 2));	// 0-2PI radians
-		new Meteor({ pos_x, pos_y }, rotation);
+		Meteor * meteor = new Meteor({ pos_x, pos_y }, rotation);
+		meteor->m_drawOrder = 3;
 	}
 }

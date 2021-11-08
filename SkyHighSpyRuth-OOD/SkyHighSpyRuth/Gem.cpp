@@ -51,6 +51,7 @@ void Gem::Spawn(GameState& state)
 		if (obj_attached->GetId() % 2)
 		{
 			Gem* g = new Gem(obj_attached->GetPosition());
+			g->m_drawOrder = 5;
 
 			//Check in display area
 			if (g->m_pos.y >= DISPLAY_HEIGHT)
