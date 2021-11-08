@@ -15,3 +15,5 @@ By having Meteors as children of Asteroids, they were able to share the update f
 ![image](https://user-images.githubusercontent.com/92981170/140786394-b5891e0d-c13a-4578-87dc-61add22f6f47.png)
 
 When refactoring my code I was able to combine the ring and dust particle effects into one class. Since they has do little class specific behaviour - the original rings didn't have a spawn function like the other game objects - it would over complicate my code to make both into their own classes. Instead I have designed the constructors so that a variety of particle effects can be through just this one class. This was especially true of the ring and dust particle effects because both of their update functions involved changing their scale, if in different directions.
+
+The UserInterface class was added to improve the final polish of the game by manipulating the draw order of the text.
