@@ -1,6 +1,6 @@
 #include "Play.h"
-#include "GameObject.h"
 #include "MainGame.h"
+#include "GameObject.h"
 #include "UserInterface.h"
 
 UserInterface::UserInterface()
@@ -27,15 +27,15 @@ void UserInterface::Draw(GameState& state)
 	}
 }
 
+void UserInterface::Score()
+{
+	Play::DrawFontText("105px", "Gems = " + std::to_string(m_score), { 50,50 }, Play::LEFT);
+}
+
 void UserInterface::Start()
 {
 	Play::DrawFontText("151px", "Level " + std::to_string(m_level), m_centreText, Play::CENTRE);
 	Play::DrawFontText("64px", "Collect " + std::to_string(m_gemNumber) + " gem(s)", m_subCentreText, Play::CENTRE);
 	Play::DrawFontText("64px", "Left and right keys to move, spacebar to jump", m_bottomText, Play::CENTRE);
-}
-
-void UserInterface::Score()
-{
-	Play::DrawFontText("105px", "Gems = " + std::to_string(m_score), { 50,50 }, Play::LEFT);
 }
 

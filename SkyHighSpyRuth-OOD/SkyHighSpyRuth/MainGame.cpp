@@ -60,6 +60,7 @@ void Restart()
 	Meteor::Spawn(gameState);
 	Asteroid::Spawn(gameState);
 	new Agent8();
+	new UserInterface();
 
 	//Reset variables
 	gameState.score = 0;
